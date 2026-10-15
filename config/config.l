@@ -3,6 +3,7 @@ extern int linectr;
 extern int brkcount;
 int skipping;
 %}
+%option noyywrap
 OCT 0[0-7]*
 DEC [1-9][0-9]*
 HEX 0x[0-9a-fA-F]+

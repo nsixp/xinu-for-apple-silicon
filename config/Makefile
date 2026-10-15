@@ -8,7 +8,7 @@ CC	= ${COMPILER_ROOT}gcc
 LEX	= ${COMPILER_ROOT}flex
 YACC	= ${COMPILER_ROOT}bison -y	# Flag enables yacc-compatible filenames
 CFLAGS	=	-std=gnu89
-LFLAGS	= -lfl
+LFLAGS	=
 
 
 #
