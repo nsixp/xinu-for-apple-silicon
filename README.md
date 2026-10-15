@@ -116,8 +116,8 @@ Homebrew packages. Tested on macOS 15 (Sequoia) on Apple Silicon.
 2. **Compile the kernel**
 
    ```sh
-   git clone https://github.com/<you>/xinu.git
-   cd xinu/compile
+   git clone https://github.com/nsixp/xinu-for-mac-arm.git
+   cd xinu-for-mac-arm/compile
    make CROSS=i686-elf-
    ```
 
@@ -162,7 +162,7 @@ New `.c` files under `shell/` are picked up automatically by the build.
 ## Project layout
 
 ```
-xinu/
+xinu-for-mac-arm/
 ├── boot/
 │   ├── grub/grub.cfg      GRUB menu (boots the multiboot kernel)
 │   ├── mkiso.sh           build boot/xinu.iso from compile/xinu.elf
