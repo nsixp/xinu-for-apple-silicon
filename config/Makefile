@@ -24,6 +24,7 @@ ${CONFIG}:	lex.yy.c y.tab.c
 
 lex.yy.c:	config.l
 		$(LEX) config.l
+		@sed -e 's/yy_size_t yyleng/int yyleng/g' lex.yy.c > lex.yy.tmp && mv lex.yy.tmp lex.yy.c
 
 y.tab.c:	config.y
 		@echo "extern	int	yyleng;" > .yyleng
