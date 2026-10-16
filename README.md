@@ -116,8 +116,8 @@ Homebrew packages. Tested on macOS 15 (Sequoia) on Apple Silicon.
 2. **Compile the kernel**
 
    ```sh
-   git clone https://github.com/nsixp/xinu-for-mac-arm.git
-   cd xinu-for-mac-arm/compile
+   git clone https://github.com/nsixp/xinu-for-apple-silicon.git
+   cd xinu-for-apple-silicon/compile
    make CROSS=i686-elf-
    ```
 
@@ -138,6 +138,55 @@ Homebrew packages. Tested on macOS 15 (Sequoia) on Apple Silicon.
 > **Rebuilds:** if you get `undefined reference to ...` after adding or
 > removing source files, run `make clean && make` in `compile/`. The build
 > caches a dependency list, so stale entries can linger otherwise.
+
+---
+
+## Optional: build inside a Debian VM
+
+The steps above build natively on macOS. If you'd rather edit and compile in a
+Linux environment (for example to follow a course lab that assumes one), run
+Xinu in a Debian VM alongside the Mac build.
+
+1. **Install UTM** (see Quick start), then create a VM with **Virtualize →
+   Emulate** and architecture **arm64**.
+
+2. **Install Debian** from the netinst image:
+   [debian-13.7.0-arm64-netinst.iso](https://cdimage.debian.org/debian-cd/13.7.0/arm64/iso-cd/debian-13.7.0-arm64-netinst.iso)
+   (the [`current/` index](https://cdimage.debian.org/debian-cd/current/arm64/iso-cd/)
+   always lists the newest build). Select the **GNOME desktop** task during
+   install if you want a graphical environment.
+
+3. **Share a folder** between the Mac and the VM, and mount it in the guest:
+
+   ```sh
+   sudo mkdir -p /media/share
+   sudo mount -t 9p -o trans=virtio,version=9p2000.L share /media/share
+   ```
+
+4. **Install the toolchain and build** with the setup script:
+
+   ```sh
+   ./scripts/setup-debian-vm.sh
+   ```
+
+   It installs `gcc-i686-linux-gnu` (the Debian cross-compiler — this is what
+   `make` uses by default, so no `CROSS=` override is needed) and builds
+   `~/xinu/compile/xinu.elf`.
+
+> **The ISO is still made on the Mac.** arm64 Debian doesn't ship
+> `grub-pc-bin`, so `boot/mkiso.sh` can't run in the guest. Instead, copy the
+> kernel to the share and let the Mac rebuild the ISO:
+>
+> ```sh
+> # in the Debian VM
+> cp ~/xinu/compile/xinu.elf /media/share/
+>
+> # on the Mac, from this repo
+> ./scripts/sync-iso.sh
+> ```
+>
+> The watcher copies the kernel into `compile/`, rebuilds `boot/xinu.iso`, and
+> logs to `sync.log`. Then reboot the VM that boots Xinu and pick up the new ISO.
 
 ---
 
@@ -162,7 +211,7 @@ New `.c` files under `shell/` are picked up automatically by the build.
 ## Project layout
 
 ```
-xinu-for-mac-arm/
+xinu-for-apple-silicon/
 ├── boot/
 │   ├── grub/grub.cfg      GRUB menu (boots the multiboot kernel)
 │   ├── mkiso.sh           build boot/xinu.iso from compile/xinu.elf
@@ -173,6 +222,7 @@ xinu-for-mac-arm/
 ├── include/               headers
 ├── lib/                   library routines
 ├── net/                   networking stack (ARP, UDP, DHCP, ...)
+├── scripts/               setup-debian-vm.sh, sync-iso.sh helpers
 ├── shell/                 the xsh shell and its commands
 └── system/                core kernel (init, process, memory, clock, ...)
 ```
